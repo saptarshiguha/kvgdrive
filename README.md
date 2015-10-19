@@ -40,13 +40,13 @@ Store a file to the google drive. This will store the file to the google
 ./main.py filename
 ```
 
-Store a file to the google drive. This will store the file to the google
+Store a file to the google drive with an  optional description. This will store the file to the google
    drive with the key name equal 'foo'. The key name will be printed
    and so will the URL (should you wish to share by URL)
 
 
 ```
-./main.py -p foo filename
+./main.py -d "Some Random File name"  -p foo filename
 ```
 
 
@@ -57,6 +57,15 @@ data in the file foo. In the second example it will save it in the file called '
 ./main.py -g -p foo
 ./main.py -g -p filename
 ```
+
+This will retrieve the description corresponding to key 'foo'
+
+
+```
+./main.py -d -g -p foo
+```
+
+
 
 This will send standard  input. If no key is given, then a short UUID is
 generated, otherwise the standard input is saved with the key name

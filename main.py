@@ -9,6 +9,7 @@ import argparse
 
 ofilelogging = None
 oShared = "MozillaKV"
+odDefault = "888ea375-a10e-4bde-8aee-342c66f94fa2"
 
 if ofilelogging is None:
     logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -19,10 +20,14 @@ parser = argparse.ArgumentParser(description='Uses %s folder on Google Drive as 
 parser.add_argument('objects', action="store", metavar='o' ,help="Either a string or a filename or blank (reads from standard input)",nargs="?")
 parser.add_argument('-p', action="store", metavar='key name',dest="p"
                     ,help="The key name(use quotes for keys with spaces). If no key is given, then if last value is a filename, then the file name becomes the key. If it is not a filename or is missing, a UUID is generated")
-parser.add_argument('-d', action="store", metavar='a string description',dest="d", help="A short description for the object")
-parser.add_argument('-s', action="store", metavar='yaml settings file',dest="s", help="The location of the settings.yaml file(defaults to current folder)")
-parser.add_argument('-g', action="store_true",dest="g", default=False,help="Retrieves the first value for the key and writes to a file,provide key in -p")
-parser.add_argument('-x', action="store_true",dest="x", default=False,help="Removes the key, provide key with -p")
+parser.add_argument('-d', nargs="?",const=odDefault,action="store"
+                    , metavar='a string description',dest="d", help="A short description for the object")
+parser.add_argument('-s', action="store", metavar='yaml settings file'
+                    ,dest="s", help="The location of the settings.yaml file(defaults to current folder)")
+parser.add_argument('-g', action="store_true",dest="g", default=False
+                    ,help="Retrieves the first value for the key and writes to a file,provide key in -p")
+parser.add_argument('-x', action="store_true",dest="x", default=False
+                    ,help="Removes the key, provide key with -p")
 
 
 
@@ -60,15 +65,19 @@ def KeyDelete(k):
             DeleteFile(file1, file1['id'])
     return True
 
-def KeyGet(k):
-    for file_list in drive.ListFile({'q': "title='%s'" % (k,), 'maxResults': 1}):
+def KeyGet(k,getDesc=False):
+    for file_list in drive.ListFile({'q': "title='%s' and '%s' in parents" % (k,mozid['id']), 'maxResults': 1}):
         if len(file_list) == 0:
             return(True)
         else:
-            logging.info("Retrieving key: %s (%s) and writing to file: %s" % (k,file_list[0]['webContentLink'],file_list[0]['title']))
-            file = drive.CreateFile({'id': file_list[0]['id']})
-            file.GetContentFile(file_list[0]['title'])
-    return True
+            if not getDesc:
+                logging.info("Retrieving key: %s (%s) and writing to file: %s" % (k,file_list[0]['webContentLink'],file_list[0]['title']))
+                file = drive.CreateFile({'id': file_list[0]['id']})
+                file.GetContentFile(file_list[0]['title'])
+            else:
+                logging.info("Description for key: %s (%s)" % (k,file_list[0]['webContentLink']))
+                print(file_list[0].get("description",""))
+    return(True)
 
 def placeXAsObject(whattype,f,key=None,desc=None):
     logging.info("Using search query for existing keyq  'q':"+"title='"+key+"'")
@@ -77,7 +86,7 @@ def placeXAsObject(whattype,f,key=None,desc=None):
         logging.info("Key:"+key+" exists, but we are going to modify with new data (and delete existing)")
         DeleteFile(file_list[0], file_list[0]['id'] )
     onb = {'title': key}
-    if desc: onb['description'] = desc
+    if desc and desc!=odDefault: onb['description'] = desc
     onb['parents'] = [{u'id': mozid['id']}]
     file1 = drive.CreateFile(onb)
     if whattype == 'file':
@@ -108,7 +117,7 @@ if __name__=="__main__":
         if results.p is None:
             logging.info("Asked to retrieve a key, yet key name not give (use -p)")
             exit(1)
-        KeyGet(results.p)
+        KeyGet(results.p, results.d is not None and results.d==odDefault)
         exit(0)
     ## Time to see what choice we need
     ## 1. If the results.objects is not none then if it is a file and exists, we call
