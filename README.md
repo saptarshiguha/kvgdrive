@@ -11,11 +11,11 @@ Clone this github, and install PyDrive
 pip install PyDrive
 ```
 
-1. For Mozilla users, ask sguha@mozilla.com to share the MozillaKV folder
-2. Also ask for the settings.yaml file
+1. Edit the settings.yaml file field "save_credentials_file" to some location
+   you like.
 
-The program in it's current form is very crude. Be warned, your critiques will
-be welcome.
+The program in it's current form is very crude. Be warned, but that said your
+critiques will be most welcome.
 
 
 ## Usage

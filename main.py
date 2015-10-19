@@ -6,19 +6,21 @@ import logging
 import argparse
 
 ofilelogging = None
+oShared = "MozillaKV"
+
 if ofilelogging is None:
     logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 else:
     logging.basicConfig(filename='log_filename.txt', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
-parser = argparse.ArgumentParser(description='Uses MozillaKV folder on Google Drive as a simple KV store')
+parser = argparse.ArgumentParser(description='Uses %s folder on Google Drive as a simple KV store' % (oShared,))
 parser.add_argument('objects', action="store", metavar='o' ,help="Either a string or a filename or blank (reads from standard input)",nargs="?")
 parser.add_argument('-p', action="store", metavar='key name',dest="p"
                     ,help="The key name(use quotes for keys with spaces). If no key is given, then if last value is a filename, then the file name becomes the key. If it is not a filename or is missing, a UUID is generated")
 parser.add_argument('-d', action="store", metavar='a string description',dest="d", help="A short description for the object")
 parser.add_argument('-s', action="store", metavar='yaml settings file',dest="s", help="The location of the settings.yaml file(defaults to current folder)")
 parser.add_argument('-g', action="store_true",dest="g", default=False,help="Retrieves the first value for the key and writes to a file,provide key in -p")
-parser.add_argument('-x', action="store_true",dest="x", default=False,help="Removes the key (wildcards allowed ...), provide key with -p")
+parser.add_argument('-x', action="store_true",dest="x", default=False,help="Removes the key, provide key with -p")
 
 
 
@@ -43,9 +45,9 @@ def init_gdrive(settings=None):
     return GoogleDrive(gauth)
 
 def getMozillaParent(drive):
-    file_list = drive.ListFile({'q': "title='MozillaKV' and mimeType = 'application/vnd.google-apps.folder'  "}).GetList()
+    file_list = drive.ListFile({'q': "title='%s' and mimeType = 'application/vnd.google-apps.folder'  " % (oShared,)}).GetList()
     if len(file_list)==0:
-        logging.info("The shared folder MozillaKV does not exist, please add it your Google Drive")
+        logging.info("The shared folder %s does not exist, please add it your Google Drive" %(oShared,))
     return file_list[0]
 
 def KeyDelete(k):
@@ -90,7 +92,7 @@ def placeXAsObject(whattype,f,key=None,desc=None):
 
 if __name__=="__main__":
     results = parser.parse_args()
-    print(results)
+    logging.debug(results)
     drive = init_gdrive(results.s)
     mozid = getMozillaParent(drive)
     if results.x:
@@ -126,11 +128,8 @@ if __name__=="__main__":
     else:
         ## read from standard input
         print("Please paste what you need into standard input and press CTRL-D when done")
-        import fileinput
-        lines = []
-        for line in fileinput.input():
-            lines.append( line)
-        lines = "\n".join(lines)
+        import sys
+        lines = "\n".join(sys.stdin)
         key  =results.p
         if key is None:
             key = str(uuid.uuid4())[:8]
