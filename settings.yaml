@@ -1,0 +1,11 @@
+client_config_backend: settings
+client_config:
+  client_id: "423721498515-nkn0m4r8oehh8seadh1rhvdhar74qgtf.apps.googleusercontent.com"
+  client_secret: "xzI5YWMq7CMFWW7LG_prLsxD"
+  redirect_uri: http://locahost:8080/
+
+save_credentials: True
+save_credentials_backend: file
+save_credentials_file: /Users/sguha/gdrive_credentials.json
+
+get_refresh_token: True
