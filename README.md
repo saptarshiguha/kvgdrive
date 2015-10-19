@@ -62,7 +62,7 @@ This will retrieve the description corresponding to key 'foo'
 
 
 ```
-./main.py -d -g -p foo
+./main.py -d  -p foo
 ```
 
 

@@ -21,7 +21,7 @@ parser.add_argument('objects', action="store", metavar='o' ,help="Either a strin
 parser.add_argument('-p', action="store", metavar='key name',dest="p"
                     ,help="The key name(use quotes for keys with spaces). If no key is given, then if last value is a filename, then the file name becomes the key. If it is not a filename or is missing, a UUID is generated")
 parser.add_argument('-d', nargs="?",const=odDefault,action="store"
-                    , metavar='a string description',dest="d", help="A short description for the object")
+                    , metavar='a string description',dest="d", help="A short description for the object. If called without an argument and -p is given, then the description for the key is returned")
 parser.add_argument('-s', action="store", metavar='yaml settings file'
                     ,dest="s", help="The location of the settings.yaml file(defaults to current folder)")
 parser.add_argument('-g', action="store_true",dest="g", default=False
@@ -113,11 +113,14 @@ if __name__=="__main__":
             exit(1)
         KeyDelete(results.p)
         exit(0)
+    if results.d is not None and  results.d==odDefault:
+        KeyGet(results.p, results.d is not None and results.d==odDefault)
+        exit(0)
     if results.g:
         if results.p is None:
             logging.info("Asked to retrieve a key, yet key name not give (use -p)")
             exit(1)
-        KeyGet(results.p, results.d is not None and results.d==odDefault)
+        KeyGet(results.p, False)
         exit(0)
     ## Time to see what choice we need
     ## 1. If the results.objects is not none then if it is a file and exists, we call
