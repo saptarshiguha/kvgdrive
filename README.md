@@ -12,7 +12,13 @@ pip install PyDrive
 ```
 
 1. Edit the settings.yaml file field "save_credentials_file" to some location
-   you like.
+you like.
+2. Make it executable
+
+```
+chmod +x main.py
+```
+
 
 The program in it's current form is very crude. Be warned, but that said your
 critiques will be most welcome.

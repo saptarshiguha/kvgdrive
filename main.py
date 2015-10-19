@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import uuid
 import os
 from pydrive.auth import GoogleAuth
