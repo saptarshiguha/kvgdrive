@@ -16,7 +16,7 @@ you like.
 2. Make it executable
 
 ```
-chmod +x main.py
+chmod +x mzkv
 ```
 
 
@@ -29,7 +29,7 @@ critiques will be most welcome.
 Get help
 
 ```
-./main.py -h
+./mzkv -h
 ```
 
 Store a file to the google drive. This will store the file to the google
@@ -37,7 +37,7 @@ Store a file to the google drive. This will store the file to the google
    and so will the URL (should you wish to share by URL)
 
 ```
-./main.py filename
+./mzkv filename
 ```
 
 Store a file to the google drive with an  optional description. This will store the file to the google
@@ -46,7 +46,7 @@ Store a file to the google drive with an  optional description. This will store 
 
 
 ```
-./main.py -d "Some Random File name"  -p foo filename
+./mzkv -d "Some Random File name"  -p foo filename
 ```
 
 
@@ -54,15 +54,15 @@ This will retrieve the object corresponding to key 'foo' and will store the
 data in the file foo. In the second example it will save it in the file called 'filename'
 
 ```
-./main.py -g -p foo
-./main.py -g -p filename
+./mzkv -g -p foo
+./mzkv -g -p filename
 ```
 
 This will retrieve the description corresponding to key 'foo'
 
 
 ```
-./main.py -d  -p foo
+./mzkv -d  -p foo
 ```
 
 
@@ -71,11 +71,11 @@ This will send standard  input. If no key is given, then a short UUID is
 generated, otherwise the standard input is saved with the key name
 
 ```
-./main.py  -p foo
+./mzkv  -p foo
 ```
 
 This will delete the key
 
 ```
-./main.py -x -p key
+./mzkv -x -p key
 ```

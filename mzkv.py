@@ -6,15 +6,10 @@ from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 import logging
 import argparse
+import ConfigParser
 
-ofilelogging = None
 oShared = "MozillaKV"
 odDefault = "888ea375-a10e-4bde-8aee-342c66f94fa2"
-
-if ofilelogging is None:
-    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
-else:
-    logging.basicConfig(filename='log_filename.txt', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 parser = argparse.ArgumentParser(description='Uses %s folder on Google Drive as a simple KV store' % (oShared,))
 parser.add_argument('objects', action="store", metavar='o' ,help="Either a string or a filename or blank (reads from standard input)",nargs="?")
@@ -23,11 +18,13 @@ parser.add_argument('-p', action="store", metavar='key name',dest="p"
 parser.add_argument('-d', nargs="?",const=odDefault,action="store"
                     , metavar='a string description',dest="d", help="A short description for the object. If called without an argument and -p is given, then the description for the key is returned")
 parser.add_argument('-s', action="store", metavar='yaml settings file'
-                    ,dest="s", help="The location of the settings.yaml file(defaults to current folder)")
+                    ,dest="s", help="The location of the settings.yaml file(defaults to  folder where mzkv is kept)")
 parser.add_argument('-g', action="store_true",dest="g", default=False
                     ,help="Retrieves the first value for the key and writes to a file,provide key in -p")
 parser.add_argument('-x', action="store_true",dest="x", default=False
                     ,help="Removes the key, provide key with -p")
+parser.add_argument('-c', action="store",metavar="path",dest="c", default="~/.mzkv"
+                    ,help="Path to config file (defaults to ~/.mzkv")
 
 
 
@@ -35,6 +32,29 @@ parser.add_argument('-x', action="store_true",dest="x", default=False
 
 drive = None
 mozid = None
+
+
+def doConfig(path):
+    cfile = os.path.abspath(path)
+    cfileBase= os.path.join(os.path.dirname(os.path.realpath(__file__)), "mzkv.cfg")
+    config = ConfigParser.ConfigParser()
+    config.readfp(open(cfileBase))
+    if os.path.isfile(cfile):
+        config.read(cfile)
+    setupLogging(config.get("base","logfile"),getattr(logging,config.get("base","loglevel")))
+    oShared = config.get("base","shared")
+
+def setupLogging(ofilelogging,loglevel):
+    ## see http://stackoverflow.com/questions/1943747/python-logging-before-you-run-logging-basicconfig
+    # root = logging.getLogger()
+    # if root.handlers:
+    #     for handler in root.handlers:
+    #         root.removeHandler(handler)
+    if ofilelogging == "":
+        logging.basicConfig(level=loglevel, format='%(asctime)s - %(levelname)s - %(message)s')
+    else:
+        logging.basicConfig(filename=ofilelogging, level=loglevel, format='%(asctime)s - %(levelname)s - %(message)s')
+
 
 def DeleteFile(fileObj,file_id):
     ## see http://stackoverflow.com/questions/24433934/deleting-a-file-via-pydrive
@@ -103,6 +123,8 @@ def placeXAsObject(whattype,f,key=None,desc=None):
 
 if __name__=="__main__":
     results = parser.parse_args()
+    if results.c:
+        doConfig(results.c)
     logging.debug(results)
     drive = init_gdrive(results.s)
     mozid = getMozillaParent(drive)
