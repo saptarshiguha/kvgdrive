@@ -24,6 +24,13 @@ The program in it's current form is very crude. Be warned, but that said your
 critiques will be most welcome.
 
 
+## Error: AttributeError: 'Module_six_moves_urllib_parse' object has no attribute 'urlparse'
+Then do this
+
+```
+sudo pip install -I google-api-python-client==1.3.2
+```
+
 ## Usage
 
 Get help

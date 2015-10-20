@@ -13,16 +13,16 @@ odDefault = "888ea375-a10e-4bde-8aee-342c66f94fa2"
 oShared=""
 parser = argparse.ArgumentParser(description='Uses %s folder on Google Drive as a simple KV store' % (oShared,))
 parser.add_argument('objects', action="store", metavar='o' ,help="Either a string or a filename or blank (reads from standard input)",nargs="?")
-parser.add_argument('-p', action="store", metavar='key name',dest="p"
+parser.add_argument('-k', action="store", metavar='key name',dest="p"
                     ,help="The key name(use quotes for keys with spaces). If no key is given, then if last value is a filename, then the file name becomes the key. If it is not a filename or is missing, a UUID is generated")
 parser.add_argument('-d', nargs="?",const=odDefault,action="store"
-                    , metavar='a string description',dest="d", help="A short description for the object. If called without an argument and -p is given, then the description for the key is returned")
+                    , metavar='a string description',dest="d", help="A short description for the object. If called without an argument and -k is given, then the description for the key is returned")
 parser.add_argument('-s', action="store", metavar='yaml settings file'
                     ,dest="s", help="The location of the settings.yaml file(defaults to  folder where mzkv is kept)")
 parser.add_argument('-g', action="store_true",dest="g", default=False
-                    ,help="Retrieves the first value for the key and writes to a file,provide key in -p")
+                    ,help="Retrieves the first value for the key and writes to a file,provide key in -k")
 parser.add_argument('-x', action="store_true",dest="x", default=False
-                    ,help="Removes the key, provide key with -p")
+                    ,help="Removes the key, provide key with -k")
 parser.add_argument('-c', action="store",metavar="path",dest="c", default="~/.mzkv"
                     ,help="Path to config file (defaults to ~/.mzkv")
 
@@ -133,7 +133,7 @@ if __name__=="__main__":
     if results.x:
         ## Delete the object
         if results.p is None:
-            logging.info("Asked to delete a key, yet key name not give (use -p)")
+            logging.info("Asked to delete a key, yet key name not give (use -k)")
             exit(1)
         KeyDelete(results.p)
         exit(0)
@@ -144,7 +144,7 @@ if __name__=="__main__":
 
     if results.g:
         if results.p is None:
-            logging.info("Asked to retrieve a key, yet key name not give (use -p)")
+            logging.info("Asked to retrieve a key, yet key name not give (use -k)")
             exit(1)
         KeyGet(results.p, False)
         exit(0)
