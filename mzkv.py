@@ -44,7 +44,11 @@ def doConfig(path):
     config.readfp(open(cfileBase))
     if os.path.isfile(cfile):
         config.read(cfile)
-    setupLogging(os.path.abspath(os.path.expanduser(config.get("base","logfile"))),getattr(logging,config.get("base","loglevel")))
+    if config.get("base","logfile") == "":
+        ff = ""
+    else:
+        ff = os.path.abspath(os.path.expanduser(config.get("base","logfile")))
+    setupLogging(ff,getattr(logging,config.get("base","loglevel")))
     return config
 
 
