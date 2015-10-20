@@ -176,7 +176,7 @@ if __name__=="__main__":
             placeXAsObject('string',results.objects,key=key, desc=results.d)
     else:
         ## read from standard input
-        print("Please paste what you need into standard input and press CTRL-D when done")
+        print("Please paste what you need into standard input and press CTRL-D (on a new line) when done")
         import sys
         lines = "\n".join(sys.stdin)
         key  =results.p
