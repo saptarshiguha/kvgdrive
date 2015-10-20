@@ -126,7 +126,7 @@ def placeXAsObject(whattype,f,key=None,desc=None):
         file1.SetContentString(f)
         file1.Upload()
         logging.info("Uploaded a string with key: '%s' and URL: %s" % (file1['title'],file1[u'webContentLink']))
-        display("File %s uploaded with key: '%s' and URL: %s" % (f,file1['title'],file1[u'webContentLink']))
+        display("String uploaded with key: '%s' and URL: %s" % (file1['title'],file1[u'webContentLink']))
     return (file1['title'],file1[u'webContentLink'])
 
 
