@@ -8,9 +8,9 @@ import logging
 import argparse
 import ConfigParser
 
-oShared = "MozillaKV"
 odDefault = "888ea375-a10e-4bde-8aee-342c66f94fa2"
 
+oShared=""
 parser = argparse.ArgumentParser(description='Uses %s folder on Google Drive as a simple KV store' % (oShared,))
 parser.add_argument('objects', action="store", metavar='o' ,help="Either a string or a filename or blank (reads from standard input)",nargs="?")
 parser.add_argument('-p', action="store", metavar='key name',dest="p"
@@ -42,7 +42,8 @@ def doConfig(path):
     if os.path.isfile(cfile):
         config.read(cfile)
     setupLogging(config.get("base","logfile"),getattr(logging,config.get("base","loglevel")))
-    oShared = config.get("base","shared")
+    return config
+
 
 def setupLogging(ofilelogging,loglevel):
     ## see http://stackoverflow.com/questions/1943747/python-logging-before-you-run-logging-basicconfig
@@ -71,10 +72,11 @@ def init_gdrive(settings=None):
     gauth.CommandLineAuth()
     return GoogleDrive(gauth)
 
-def getMozillaParent(drive):
+def getMozillaParent(drive,cfg):
+    oShared = cfg.get("base","shared")
     file_list = drive.ListFile({'q': "title='%s' and mimeType = 'application/vnd.google-apps.folder'  " % (oShared,)}).GetList()
     if len(file_list)==0:
-        logging.info("The shared folder %s does not exist, please add it your Google Drive" %(oShared,))
+        logging.critical("The shared folder %s does not exist, please add it your Google Drive" %(oShared,))
     return file_list[0]
 
 def KeyDelete(k):
@@ -123,11 +125,11 @@ def placeXAsObject(whattype,f,key=None,desc=None):
 
 if __name__=="__main__":
     results = parser.parse_args()
-    if results.c:
-        doConfig(results.c)
+    config = doConfig(results.c)
     logging.debug(results)
     drive = init_gdrive(results.s)
-    mozid = getMozillaParent(drive)
+    mozid = getMozillaParent(drive,config)
+
     if results.x:
         ## Delete the object
         if results.p is None:
@@ -135,15 +137,18 @@ if __name__=="__main__":
             exit(1)
         KeyDelete(results.p)
         exit(0)
+
     if results.d is not None and  results.d==odDefault:
         KeyGet(results.p, results.d is not None and results.d==odDefault)
         exit(0)
+
     if results.g:
         if results.p is None:
             logging.info("Asked to retrieve a key, yet key name not give (use -p)")
             exit(1)
         KeyGet(results.p, False)
         exit(0)
+
     ## Time to see what choice we need
     ## 1. If the results.objects is not none then if it is a file and exists, we call
     ## placeFileAsObject
