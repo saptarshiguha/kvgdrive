@@ -7,6 +7,7 @@ from pydrive.drive import GoogleDrive
 import logging
 import argparse
 import ConfigParser
+import sys
 
 odDefault = "888ea375-a10e-4bde-8aee-342c66f94fa2"
 
@@ -33,6 +34,8 @@ parser.add_argument('-c', action="store",metavar="path",dest="c", default="~/.mz
 drive = None
 mozid = None
 
+def display(m):
+    sys.stderr.writeln(m)
 
 def doConfig(path):
     cfile = os.path.abspath(path)
@@ -84,6 +87,7 @@ def KeyDelete(k):
         logging.info('KeyDelete: Received %s files from Files.list()' % len(file_list)) # <= 10
         for file1 in file_list:
             logging.debug("Deleting %s [id=%s]" % (file1['title'], file1['id']))
+            display("Deleting %s [id=%s]" % (file1['title'], file1['id']))
             DeleteFile(file1, file1['id'])
     return True
 
@@ -94,10 +98,12 @@ def KeyGet(k,getDesc=False):
         else:
             if not getDesc:
                 logging.info("Retrieving key: %s (%s) and writing to file: %s" % (k,file_list[0]['webContentLink'],file_list[0]['title']))
+                display("Retrieving key: %s (%s) and writing to file: %s" % (k,file_list[0]['webContentLink'],file_list[0]['title']))
                 file = drive.CreateFile({'id': file_list[0]['id']})
                 file.GetContentFile(file_list[0]['title'])
             else:
                 logging.info("Description for key: %s (%s)" % (k,file_list[0]['webContentLink']))
+                display("Retrieving key: %s (%s) and writing to file: %s" % (k,file_list[0]['webContentLink'],file_list[0]['title']))
                 print(file_list[0].get("description",""))
     return(True)
 
@@ -115,10 +121,12 @@ def placeXAsObject(whattype,f,key=None,desc=None):
         file1.SetContentFile(f)
         file1.Upload()
         logging.info("File %s uploaded with key: '%s' and URL: %s" % (f,file1['title'],file1[u'webContentLink']))
+        display("File %s uploaded with key: '%s' and URL: %s" % (f,file1['title'],file1[u'webContentLink']))
     elif whattype == 'string':
         file1.SetContentString(f)
         file1.Upload()
         logging.info("Uploaded a string with key: '%s' and URL: %s" % (file1['title'],file1[u'webContentLink']))
+        display("File %s uploaded with key: '%s' and URL: %s" % (f,file1['title'],file1[u'webContentLink']))
     return (file1['title'],file1[u'webContentLink'])
 
 
