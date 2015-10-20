@@ -35,16 +35,16 @@ drive = None
 mozid = None
 
 def display(m):
-    sys.stderr.writeln(m)
+    print >>sys.stderr, m
 
 def doConfig(path):
-    cfile = os.path.abspath(path)
+    cfile = os.path.abspath(os.path.expanduser(path))
     cfileBase= os.path.join(os.path.dirname(os.path.realpath(__file__)), "mzkv.cfg")
     config = ConfigParser.ConfigParser()
     config.readfp(open(cfileBase))
     if os.path.isfile(cfile):
         config.read(cfile)
-    setupLogging(config.get("base","logfile"),getattr(logging,config.get("base","loglevel")))
+    setupLogging(os.path.abspath(os.path.expanduser(config.get("base","logfile"))),getattr(logging,config.get("base","loglevel")))
     return config
 
 
