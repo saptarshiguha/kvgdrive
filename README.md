@@ -28,7 +28,7 @@ critiques will be most welcome.
 Then do this
 
 ```
-sudo pip install -I google-api-python-client==1.3.2
+sudo pip install -I google-api-kython-client==1.3.2
 ```
 
 ## Usage
@@ -53,7 +53,7 @@ Store a file to the google drive with an  optional description. This will store 
 
 
 ```
-./mzkv -d "Some Random File name"  -p foo filename
+./mzkv -d "Some Random File name"  -k foo filename
 ```
 
 
@@ -61,15 +61,15 @@ This will retrieve the object corresponding to key 'foo' and will store the
 data in the file foo. In the second example it will save it in the file called 'filename'
 
 ```
-./mzkv -g -p foo
-./mzkv -g -p filename
+./mzkv -g -k foo
+./mzkv -g -k filename
 ```
 
 This will retrieve the description corresponding to key 'foo'
 
 
 ```
-./mzkv -d  -p foo
+./mzkv -d  -k foo
 ```
 
 
@@ -78,11 +78,11 @@ This will send standard  input. If no key is given, then a short UUID is
 generated, otherwise the standard input is saved with the key name
 
 ```
-./mzkv  -p foo
+./mzkv  -k foo
 ```
 
 This will delete the key
 
 ```
-./mzkv -x -p key
+./mzkv -x -k key
 ```
