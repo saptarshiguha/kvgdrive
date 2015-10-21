@@ -18,23 +18,16 @@ you like. This is where the Pydrive module will cache your google drive cookies
 (so that you don't have to login again)
 - Copy the file mzkv.cfg to `$HOME/.mzkv`
    - I recommend you edit  `logfile` to a path where log messages will be written
+   - You can leave `gdriveAuth` as is
 
-2. Make it executable
+- Make it executable ``chmod +x mzkv.py``
 
-```
-chmod +x mzkv
-```
+- Add the path to the repo to your `$PATH`
 
 
 The program in it's current form is very crude. Be warned, but that said your
 critiques will be most welcome.
 
-
-   - You can leave `gdriveAuth` as is
-
-- Make it executable `chmod +x mzkv.py`
-
-- Add the path to the repo to your `$PATH`
 
 ## Error: `AttributeError: 'Module_six_moves_urllib_parse' object has no attribute 'urlparse'`
 Then do this
@@ -44,6 +37,7 @@ sudo pip install -I google-api-kython-client==1.3.2
 ```
 
 ## Usage
+In the following examples, ``mzkv`` is an alias for ``mzkv.py``
 
 Get help
 
