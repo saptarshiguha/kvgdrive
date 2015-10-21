@@ -26,6 +26,8 @@ parser.add_argument('-x', action="store_true",dest="x", default=False
                     ,help="Removes the key, provide key with -k")
 parser.add_argument('-c', action="store",metavar="path",dest="c", default="~/.mzkv"
                     ,help="Path to config file (defaults to ~/.mzkv")
+parser.add_argument('--cmdline', action="store_true",dest="cmd", default=False
+                    ,help="Use command line based authentification. Useful when you're trying to use this on a remote server")
 
 
 
@@ -71,12 +73,15 @@ def DeleteFile(fileObj,file_id):
     except errors.HttpError, error:
         logging.info( 'An error occurred: %s' % error)
 
-def init_gdrive(settings=None):
+def init_gdrive(settings=None,usecmdline=False):
     if settings is None:
         settings_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'settings.yaml')
     logging.debug("Settings file: "+ settings_file)
     gauth = GoogleAuth(settings_file=settings_file)
-    gauth.CommandLineAuth()
+    if usecmdline:
+        gauth.CommandLineAuth()
+    else:
+        gauth.LocalWebserverAuth()
     return GoogleDrive(gauth)
 
 def getMozillaParent(drive,cfg):
@@ -140,9 +145,9 @@ if __name__=="__main__":
     config = doConfig(results.c)
     logging.debug(results)
     if config.get("base","gdriveAuth") == "":
-        drive = init_gdrive(None)
+        drive = init_gdrive(None,results.cmd)
     else:
-        drive = init_gdrive(config.get("base","gdriveAuth"))
+        drive = init_gdrive(config.get("base","gdriveAuth"),results.cmd)
     mozid = getMozillaParent(drive,config)
 
     if results.x:
