@@ -26,7 +26,7 @@ you like. This is where the Pydrive module will cache your google drive cookies
 
 
 The program in it's current form is very crude. Be warned, but that said your
-critiques will be most welcome.
+comments  will be most welcome.
 
 
 ## Error: `AttributeError: 'Module_six_moves_urllib_parse' object has no attribute 'urlparse'`
