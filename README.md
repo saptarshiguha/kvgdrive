@@ -54,7 +54,7 @@ mzkv filename
 ```
 
 Store a file to the google drive with an  optional description. This will store the file to the google
-   drive with the key name equal 'foo'. The key name will be printed
+   drive with the key name equal to `foo`. The key name will be printed
    and so will the URL (should you wish to share by URL)
 
 
@@ -63,15 +63,15 @@ mzkv -d "Some Random File name"  -k foo filename
 ```
 
 
-This will retrieve the object corresponding to key 'foo' and will store the
-data in the file foo. In the second example it will save it in the file called 'filename'
+This will retrieve the object corresponding to key `foo` and will store the
+data in the file called `foo`. In the second example it will save it in the file called 'filename'
 
 ```
 mzkv -g -k foo
 mzkv -g -k filename
 ```
 
-This will retrieve the description corresponding to key 'foo'
+This will retrieve the description corresponding to key `foo`
 
 
 ```
@@ -80,7 +80,7 @@ mzkv -d  -k foo
 
 
 
-This will send standard  input. If no key is given, then a short UUID is
+This will wait for standard  input. If no key is given, then a short UUID is
 generated, otherwise the standard input is saved with the key name
 
 ```
