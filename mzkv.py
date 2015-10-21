@@ -18,8 +18,8 @@ parser.add_argument('-k', action="store", metavar='key name',dest="p"
                     ,help="The key name(use quotes for keys with spaces). If no key is given, then if last value is a filename, then the file name becomes the key. If it is not a filename or is missing, a UUID is generated")
 parser.add_argument('-d', nargs="?",const=odDefault,action="store"
                     , metavar='a string description',dest="d", help="A short description for the object. If called without an argument and -k is given, then the description for the key is returned")
-parser.add_argument('-s', action="store", metavar='yaml settings file'
-                    ,dest="s", help="The location of the settings.yaml file(defaults to  folder where mzkv is kept)")
+# parser.add_argument('-s', action="store", metavar='yaml settings file'
+#                     ,dest="s", help="The location of the settings.yaml file(defaults to  folder where mzkv is kept)")
 parser.add_argument('-g', action="store_true",dest="g", default=False
                     ,help="Retrieves the first value for the key and writes to a file,provide key in -k")
 parser.add_argument('-x', action="store_true",dest="x", default=False
@@ -140,9 +140,9 @@ if __name__=="__main__":
     config = doConfig(results.c)
     logging.debug(results)
     if config.get("base","gdriveAuth") == "":
-        drive = init_gdrive(results.s)
+        drive = init_gdrive(None)
     else:
-        drive = init_gdrive(results.s,config.get("base","gdriveAuth"))
+        drive = init_gdrive(config.get("base","gdriveAuth"))
     mozid = getMozillaParent(drive,config)
 
     if results.x:
