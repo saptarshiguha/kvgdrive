@@ -139,7 +139,10 @@ if __name__=="__main__":
     results = parser.parse_args()
     config = doConfig(results.c)
     logging.debug(results)
-    drive = init_gdrive(results.s)
+    if config.get("base","gdriveAuth") == "":
+        drive = init_gdrive(results.s)
+    else:
+        drive = init_gdrive(results.s,config.get("base","gdriveAuth"))
     mozid = getMozillaParent(drive,config)
 
     if results.x:
