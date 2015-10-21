@@ -32,7 +32,7 @@ critiques will be most welcome.
 
    - You can leave `gdriveAuth` as is
 
-- `chmod +x mzkv.py`
+- Make it executable `chmod +x mzkv.py`
 
 - Add the path to the repo to your `$PATH`
 
