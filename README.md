@@ -13,10 +13,10 @@ pip install PyDrive
 
 There are two config files you need to edit.
 
-1. Inside this repo, edit settings.yaml file field called `save_credentials_file` to some location
+- Inside this repo, edit settings.yaml file field called `save_credentials_file` to some location
 you like. This is where the Pydrive module will cache your google drive cookies
 (so that you don't have to login again)
-2. Copy the file mzkv.cfg,
+- Copy the file mzkv.cfg to `$HOME/.mzkv`
    - I recommend you edit  `logfile` to a path where log messages will be written
 
 2. Make it executable
@@ -31,8 +31,10 @@ critiques will be most welcome.
 
 
    - You can leave `gdriveAuth` as is
-3. `chmod +x mzkv.py`
-4. Add the path to the repo to your `$PATH`
+
+- `chmod +x mzkv.py`
+
+- Add the path to the repo to your `$PATH`
 
 ## Error: `AttributeError: 'Module_six_moves_urllib_parse' object has no attribute 'urlparse'`
 Then do this
