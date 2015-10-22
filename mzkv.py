@@ -111,16 +111,22 @@ def KeyDelete(k):
     return True
 
 def KeyGet(k,getDesc=False):
+    index = 1
     for file_list in drive.ListFile({'q': "title='%s' and '%s' in parents" % (k,mozid['id']), 'maxResults': 1}):
         if len(file_list) == 0:
             return(False)
         else:
             if not getDesc:
-                logging.info("Retrieving key: %s (%s) and writing to file: %s" % (k,file_list[0]['webContentLink'],file_list[0]['title']))
-                display("Retrieving key: %s (%s) and writing to file: %s" % (k,file_list[0]['webContentLink'],file_list[0]['title']))
                 file = drive.CreateFile({'id': file_list[0]['id']})
-                print(os.path.realpath(__file__))
-                file.GetContentFile(file_list[0]['title'])
+                filenamethis= os.path.join(os.getcwd(), file_list[0]['title'])
+                if os.path.isfile(filenamethis):
+                    filenameW = filenamethis+"."+str(index)
+                    index = index + 1
+                else:
+                    filenameW = filenamethis
+                file.GetContentFile(filenameW)
+                logging.info("Retrieving key: %s (%s) and writing to file: %s" % (k,file_list[0]['webContentLink'],filenameW))
+                display("Retrieving key: %s (%s) and writing to file: %s" % (k,file_list[0]['webContentLink'],filenameW))
             else:
                 logging.info("Description for key: %s (%s)" % (k,file_list[0]['webContentLink']))
                 display("Retrieving key: %s (%s) and writing to file: %s" % (k,file_list[0]['webContentLink'],file_list[0]['title']))
