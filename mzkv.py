@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 
-import uuid
-import os
-from pydrive.auth import GoogleAuth
-from pydrive.drive import GoogleDrive
-import logging
 import argparse
 import ConfigParser
+import googleapiclient
+import logging
+import os
 import sys
+import uuid
+
+from pydrive.auth import GoogleAuth
+from pydrive.drive import GoogleDrive
 
 odDefault = "888ea375-a10e-4bde-8aee-342c66f94fa2"
 
@@ -66,12 +68,20 @@ def setupLogging(ofilelogging,loglevel):
         logging.basicConfig(filename=ofilelogging, level=loglevel, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
+def makeOwnerString(f):
+    s = ''
+    for p in f:
+        s = s+" %s <%s> " % (p[u'displayName'],p[u'emailAddress'])
+    return(s)
+
 def DeleteFile(fileObj,file_id):
     ## see http://stackoverflow.com/questions/24433934/deleting-a-file-via-pydrive
-    try:
-        fileObj.auth.service.files().delete(fileId=file_id).execute()
-    except errors.HttpError, error:
-        logging.info( 'An error occurred: %s' % error)
+  try:
+      fileObj.auth.service.files().delete(fileId=file_id).execute()
+  except googleapiclient.errors.HttpError,e:
+      display('You are likley trying to use some one else\'s key: %s\n' % (makeOwnerString(fileObj['owners'])))
+      logging.warning('You are likley trying to use some one else\'s key: %s \n %s' % (makeOwnerString(fileObj['owners']),e))
+      raise(e)
 
 def init_gdrive(settings=None,usecmdline=False):
     if settings is None:
@@ -103,12 +113,13 @@ def KeyDelete(k):
 def KeyGet(k,getDesc=False):
     for file_list in drive.ListFile({'q': "title='%s' and '%s' in parents" % (k,mozid['id']), 'maxResults': 1}):
         if len(file_list) == 0:
-            return(True)
+            return(False)
         else:
             if not getDesc:
                 logging.info("Retrieving key: %s (%s) and writing to file: %s" % (k,file_list[0]['webContentLink'],file_list[0]['title']))
                 display("Retrieving key: %s (%s) and writing to file: %s" % (k,file_list[0]['webContentLink'],file_list[0]['title']))
                 file = drive.CreateFile({'id': file_list[0]['id']})
+                print(os.path.realpath(__file__))
                 file.GetContentFile(file_list[0]['title'])
             else:
                 logging.info("Description for key: %s (%s)" % (k,file_list[0]['webContentLink']))
@@ -188,7 +199,7 @@ if __name__=="__main__":
             placeXAsObject('string',results.objects,key=key, desc=results.d)
     else:
         ## read from standard input
-        print("Please paste what you need into standard input and press CTRL-D (on a new line) when done")
+        print("Please paste what you need into standard input and press CTRL-D (on a new line) for OSX/Linux or CTRL-Z (on a new line) for Windows when done")
         import sys
         lines = "\n".join(sys.stdin)
         key  =results.p
