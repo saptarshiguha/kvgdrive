@@ -31,7 +31,7 @@ parser.add_argument('-x', action="store_true",dest="x", default=False
 parser.add_argument('-c', action="store",metavar="path",dest="c", default="~/.mzkv"
                     ,help="Path to config file (defaults to ~/.mzkv")
 parser.add_argument('--cmdline', action="store_true",dest="cmd", default=False
-                    ,help="Use command line based authentification. Useful when you're trying to use this on a remote server")
+                    ,help="Use command line based authentification. Useful when you're trying to use this on a remote server with no GUI")
 
 
 
