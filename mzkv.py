@@ -2,10 +2,12 @@
 
 import argparse
 import ConfigParser
+import fileinput
 import googleapiclient
 import logging
 import os
 import sys
+import traceback
 import uuid
 
 from pydrive.auth import GoogleAuth
@@ -79,8 +81,8 @@ def DeleteFile(fileObj,file_id):
   try:
       fileObj.auth.service.files().delete(fileId=file_id).execute()
   except googleapiclient.errors.HttpError,e:
-      display('You are likley trying to use some one else\'s key: %s\n' % (makeOwnerString(fileObj['owners'])))
-      logging.warning('You are likley trying to use some one else\'s key: %s \n %s' % (makeOwnerString(fileObj['owners']),e))
+      display('You are likley trying to write to another users\'s key: %s\n' % (makeOwnerString(fileObj['owners'])))
+      logging.warning('You are likley trying to write to another user\'s key: %s \n %s' % (makeOwnerString(fileObj['owners']),e))
       raise(e)
 
 def init_gdrive(settings=None,usecmdline=False):
@@ -99,6 +101,8 @@ def getMozillaParent(drive,cfg):
     file_list = drive.ListFile({'q': "title='%s' and mimeType = 'application/vnd.google-apps.folder'  " % (oShared,)}).GetList()
     if len(file_list)==0:
         logging.critical("The shared folder %s does not exist, please add it your Google Drive" %(oShared,))
+        display("The shared folder %s does not exist, please add it your Google Drive" %(oShared,))
+        return(False)
     return file_list[0]
 
 def KeyDelete(k):
@@ -166,51 +170,55 @@ if __name__=="__main__":
     else:
         drive = init_gdrive(config.get("base","gdriveAuth"),results.cmd)
     mozid = getMozillaParent(drive,config)
+    if mozid == False:
+        exit(1)
+    try:
+        if results.x:
+            ## Delete the object
+            if results.p is None:
+                logging.info("Asked to delete a key, yet key name not give (use -k)")
+                exit(1)
+            KeyDelete(results.p)
+            exit(0)
 
-    if results.x:
-        ## Delete the object
-        if results.p is None:
-            logging.info("Asked to delete a key, yet key name not give (use -k)")
-            exit(1)
-        KeyDelete(results.p)
-        exit(0)
+        if results.d is not None and  results.d==odDefault:
+            KeyGet(results.p, results.d is not None and results.d==odDefault)
+            exit(0)
 
-    if results.d is not None and  results.d==odDefault:
-        KeyGet(results.p, results.d is not None and results.d==odDefault)
-        exit(0)
-
-    if results.g:
-        if results.p is None:
-            logging.info("Asked to retrieve a key, yet key name not give (use -k)")
-            exit(1)
-        KeyGet(results.p, False)
-        exit(0)
-
-    ## Time to see what choice we need
-    ## 1. If the results.objects is not none then if it is a file and exists, we call
-    ## placeFileAsObject
-    if results.objects is not None:
-        f = os.path.abspath(results.objects)
-        if os.path.isfile(f):
-            key = results.p
-            if key is None:
-                key = os.path.basename(f)
-            logging.info("Inserting file: %s with key: %s" % (f, key))
-            placeXAsObject('file',f,key=key, desc=results.d)
+        if results.g:
+            if results.p is None:
+                logging.info("Asked to retrieve a key, yet key name not give (use -k)")
+                exit(1)
+            KeyGet(results.p, False)
+            exit(0)
+        if results.objects is not None:
+            f = os.path.abspath(results.objects)
+            if os.path.isfile(f):
+                key = results.p
+                if key is None:
+                    key = os.path.basename(f)
+                logging.info("Inserting file: %s with key: %s" % (f, key))
+                placeXAsObject('file',f,key=key, desc=results.d)
+            else:
+                key  = results.p
+                if key is None:
+                    key = str(uuid.uuid4())[:8]
+                logging.info("Inserting string with key: %s " % (key,))
+                placeXAsObject('string',results.objects,key=key, desc=results.d)
         else:
+            ## read from standard input
+            print("Please paste what you need into standard input and press CTRL-D (on a new line) for OSX/Linux or CTRL-Z (on a new line) for Windows when done\n")
+            # lines = "\n".join(sys.stdin)
+            lines = []
+            for line in fileinput.input([]):
+                lines.append(line)
             key  =results.p
             if key is None:
                 key = str(uuid.uuid4())[:8]
-            logging.info("Inserting string with key: %s " % (key,))
-            placeXAsObject('string',results.objects,key=key, desc=results.d)
-    else:
-        ## read from standard input
-        print("Please paste what you need into standard input and press CTRL-D (on a new line) for OSX/Linux or CTRL-Z (on a new line) for Windows when done")
-        import sys
-        lines = "\n".join(sys.stdin)
-        key  =results.p
-        if key is None:
-            key = str(uuid.uuid4())[:8]
-        logging.info("Inserting contents from standard input  with key: %s " % (key,))
-        placeXAsObject('string',lines,key=key, desc=results.d)
-    exit(0)
+            logging.info("Inserting contents from standard input  with key: %s " % (key,))
+            placeXAsObject('string',"\n".join(lines),key=key, desc=results.d)
+            exit(0)
+    except Exception, e:
+        logging.warn(str(e))
+        logging.warn(traceback.format_exc())
+        exit(1)
